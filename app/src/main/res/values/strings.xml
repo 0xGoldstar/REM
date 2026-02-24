@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">REM</string>
+    <string name="url_hint">Paste video URL here…</string>
+    <string name="btn_fetch">Fetch Video</string>
+    <string name="btn_download">Download</string>
+    <string name="downloading">Downloading…</string>
+    <string name="download_complete">Download complete</string>
+    <string name="download_failed">Download failed</string>
+    <string name="notification_channel_name">REM Downloads</string>
+    <string name="notification_channel_desc">Video download progress</string>
+</resources>

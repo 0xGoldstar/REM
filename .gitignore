@@ -1,0 +1,27 @@
+# Built outputs
+/build/
+/app/build/
+
+# Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Local config (contains SDK path)
+local.properties
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Signing keys
+*.jks
+*.keystore
+
+# Claude Code
+.claude/

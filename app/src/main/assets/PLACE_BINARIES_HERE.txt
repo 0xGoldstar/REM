@@ -1,0 +1,10 @@
+# Binary Assets
+
+Place the yt-dlp binaries here before building:
+
+  yt-dlp-arm64    ← for real Android devices (ARM64)
+  yt-dlp-x86_64   ← for Android emulators (x86_64)
+
+Download from: https://github.com/yt-dlp/yt-dlp/releases
+
+See the main README.md for detailed instructions.
