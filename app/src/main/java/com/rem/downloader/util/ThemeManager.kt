@@ -11,6 +11,9 @@ object ThemeManager {
     private const val KEY_USE_SYSTEM_COLOR = "use_system_color"
     private const val KEY_CUSTOM_COLOR = "custom_color"
     private const val KEY_VIBRATE_ON_DOWNLOAD = "vibrate_on_download"
+    private const val KEY_APPEND_EDIT_SUFFIX = "append_edit_suffix"
+    private const val KEY_PERSIST_TAB = "persist_tab"
+    private const val KEY_LAST_TAB = "last_tab"  // 0 = Basic, 1 = Advanced
 
     // Default REM red
     const val DEFAULT_COLOR = 0xFFE53935.toInt()
@@ -45,6 +48,24 @@ object ThemeManager {
 
     fun setVibrateOnDownload(context: Context, value: Boolean) =
         prefs(context).edit { putBoolean(KEY_VIBRATE_ON_DOWNLOAD, value) }
+
+    fun appendEditSuffix(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_APPEND_EDIT_SUFFIX, true)
+
+    fun setAppendEditSuffix(context: Context, value: Boolean) =
+        prefs(context).edit { putBoolean(KEY_APPEND_EDIT_SUFFIX, value) }
+
+    fun persistTab(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_PERSIST_TAB, true)
+
+    fun setPersistTab(context: Context, value: Boolean) =
+        prefs(context).edit { putBoolean(KEY_PERSIST_TAB, value) }
+
+    fun getLastTab(context: Context): Int =
+        prefs(context).getInt(KEY_LAST_TAB, 0)
+
+    fun setLastTab(context: Context, tab: Int) =
+        prefs(context).edit { putInt(KEY_LAST_TAB, tab) }
 
     @ColorInt
     fun getSystemAccentColor(context: Context): Int {

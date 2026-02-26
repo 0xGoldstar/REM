@@ -93,16 +93,76 @@ class YtDlpHelper(private val context: Context) {
         }
     }
 
+    /**
+     * Downloads the lowest-quality version of a video for local preview purposes.
+     * Caps at 360p, prefers mp4 container. Saves to [outputDir]/preview.<ext>.
+     */
+    fun downloadPreview(
+        url: String,
+        outputDir: File,
+        onProgress: (Int) -> Unit
+    ): Result<File> {
+        return try {
+            outputDir.mkdirs()
+
+            val request = YoutubeDLRequest(url).apply {
+                // Prefer a pre-muxed (single-file) stream so progress is one continuous
+                // 0→100% pass. Separate video+audio streams cause the bar to reset.
+                addOption(
+                    "-f",
+                    "worst[vcodec!=none][acodec!=none][height<=360][ext=mp4]" +
+                    "/worst[vcodec!=none][acodec!=none][height<=360]" +
+                    "/worst[vcodec!=none][acodec!=none]" +
+                    "/worst[ext=mp4]" +
+                    "/worst"
+                )
+                addOption("-o", File(outputDir, "preview.%(ext)s").absolutePath)
+                addOption("--no-playlist")
+                addOption("--socket-timeout", "30")
+                addOption("--retries", "3")
+                addOption("--merge-output-format", "mp4")
+            }
+
+            val existingPaths = outputDir.listFiles()?.map { it.absolutePath }?.toSet() ?: emptySet()
+
+            YoutubeDL.getInstance().execute(request) { progress, _, _ ->
+                onProgress(progress.toInt())
+            }
+
+            val previewFile = outputDir.listFiles()
+                ?.filter { it.absolutePath !in existingPaths }
+                ?.filter { !it.name.endsWith(".part") && !it.name.endsWith(".ytdl") }
+                ?.maxByOrNull { it.lastModified() }
+                ?: outputDir.listFiles()
+                    ?.filter { !it.name.endsWith(".part") && !it.name.endsWith(".ytdl") }
+                    ?.maxByOrNull { it.lastModified() }
+
+            if (previewFile != null && previewFile.exists()) {
+                Result.success(previewFile)
+            } else {
+                Result.failure(Exception("Preview file not found after download"))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "downloadPreview error: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
     private fun mapToVideoInfo(
         info: com.yausername.youtubedl_android.mapper.VideoInfo,
         sourceUrl: String
     ): VideoInfo {
-        val resolutions = info.formats
-            ?.mapNotNull { it.height }
-            ?.filter { it > 0 }
-            ?.sortedDescending()
-            ?.distinct()
-            ?: emptyList()
+        val formats = info.formats ?: emptyList()
+        val resolutions = formats
+            .mapNotNull { it.height }
+            .filter { it > 0 }
+            .sortedDescending()
+            .distinct()
+
+        // Best format = highest resolution with both width and height available
+        val bestFormat = formats
+            .filter { (it.width ?: 0) > 0 && (it.height ?: 0) > 0 }
+            .maxByOrNull { (it.width ?: 0) * (it.height ?: 0) }
 
         return VideoInfo(
             title = info.title ?: "Unknown Title",
@@ -112,7 +172,9 @@ class YtDlpHelper(private val context: Context) {
             directStreamUrl = info.url,
             availableResolutions = resolutions,
             sourceUrl = sourceUrl,
-            platform = info.extractor ?: "Unknown"
+            platform = info.extractor ?: "Unknown",
+            videoWidth = bestFormat?.width ?: 0,
+            videoHeight = bestFormat?.height ?: 0
         )
     }
 

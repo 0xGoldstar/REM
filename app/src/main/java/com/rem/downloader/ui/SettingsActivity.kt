@@ -19,6 +19,11 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
 
+    companion object {
+        // Survives recreate() so we can scroll to the color picker after activity recreation
+        private var pendingScrollToColorPicker = false
+    }
+
     data class Preset(val label: String, val color: Int)
 
     // Curated palette — muted, balanced, dark-UI friendly
@@ -55,6 +60,16 @@ class SettingsActivity : AppCompatActivity() {
         buildColorGrid()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (pendingScrollToColorPicker && binding.cardColorPicker.visibility == View.VISIBLE) {
+            pendingScrollToColorPicker = false
+            binding.settingsScrollView.post {
+                binding.settingsScrollView.smoothScrollTo(0, binding.cardColorPicker.top)
+            }
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) { finish(); return true }
         return super.onOptionsItemSelected(item)
@@ -76,6 +91,16 @@ class SettingsActivity : AppCompatActivity() {
         binding.switchVibrate.setOnCheckedChangeListener { _, checked ->
             ThemeManager.setVibrateOnDownload(this, checked)
         }
+
+        binding.switchAppendSuffix.isChecked = ThemeManager.appendEditSuffix(this)
+        binding.switchAppendSuffix.setOnCheckedChangeListener { _, checked ->
+            ThemeManager.setAppendEditSuffix(this, checked)
+        }
+
+        binding.switchPersistTab.isChecked = ThemeManager.persistTab(this)
+        binding.switchPersistTab.setOnCheckedChangeListener { _, checked ->
+            ThemeManager.setPersistTab(this, checked)
+        }
     }
 
     private fun setupAccentSection() {
@@ -85,7 +110,8 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.switchSystemColor.setOnCheckedChangeListener { _, checked ->
             ThemeManager.setUseSystemColor(this, checked)
-            // Recreate so DynamicColors can be applied/removed
+            // If turning off system color, scroll to the color picker after recreation
+            if (!checked) pendingScrollToColorPicker = true
             recreate()
         }
 
@@ -135,7 +161,7 @@ class SettingsActivity : AppCompatActivity() {
 
         // Tint all switches to match accent
         val dimmed = ColorStateList.valueOf(ColorUtils.setAlphaComponent(color, 80))
-        for (sw in listOf(binding.switchSystemColor, binding.switchVibrate)) {
+        for (sw in listOf(binding.switchSystemColor, binding.switchVibrate, binding.switchAppendSuffix, binding.switchPersistTab)) {
             sw.thumbTintList = colorSL
             sw.trackTintList = dimmed
         }

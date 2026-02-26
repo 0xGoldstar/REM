@@ -1,20 +1,33 @@
-# REM — Video Downloader for Android
+# REM — Record, Extract, Manage
 
-REM is a clean, dark-themed Android app that downloads videos from YouTube, Twitter/X, Instagram, TikTok, Reddit, and 1,000+ other platforms using **yt-dlp** under the hood.
+REM is a clean, dark-themed Android video downloader and editor. Paste a URL, preview the video, trim/crop it, pick your format, and download — all in one flow. Powered by **yt-dlp** and **FFmpeg** under the hood.
 
 ---
 
 ## Features
 
-- **Paste any URL** from YouTube, Twitter/X, Instagram, TikTok, Reddit, Facebook, Vimeo, and more
-- **Video preview** with ExoPlayer (plays directly in-app before downloading)
-- **Format options**: Video + Audio / Video Only / Audio Only
+### Downloading
+- **Paste any URL** from YouTube, Twitter/X, Instagram, TikTok, Reddit, Facebook, Vimeo, and 1,000+ other sites
+- **Format options**: Video + Audio / Video Only
 - **Resolution selector** populated from the video's actual available formats
 - **Rename file** before download (optional)
-- **Background download** via WorkManager with live notification progress
-- **Downloads to `Downloads/REM/`** on your device storage
-- **Share intent support** — share a URL from any browser or app directly into REM
-- Dark theme, Material 3 design
+- **Background download** via WorkManager with live progress bar and notification
+- **Downloads to `Downloads/REM/`** on device storage
+- **Share intent support** — share a URL directly from any browser or app into REM
+
+### Editing (Advanced mode)
+- **Video preview** with ExoPlayer, autoplays when ready
+- **Trim**: range slider with live playback position indicator, loops within trim range
+- **Crop**: interactive overlay with draggable corner handles, aspect ratio presets (16:9, 4:3, 9:16, 3:4, 4:5, 1:1, Free), portrait/landscape orientation toggle
+- **GIF export**: configurable FPS (10/15/24) and quality (320/480/640px), live size estimate
+- **Single FFmpeg pass**: trim + crop + format conversion applied together, no intermediate files
+
+### UI / Settings
+- **Basic / Advanced tabs**: Basic hides the preview and editing tools for a simple download experience; persists across sessions
+- **Accent color picker**: 12 curated presets or Android system dynamic color (Material You)
+- **Append edit labels** to filenames (`_trimmed`, `_cropped`) — toggle on/off
+- **Haptic feedback** on download completion
+- Material 3 dark theme throughout
 
 ---
 
@@ -24,19 +37,17 @@ REM is a clean, dark-themed Android app that downloads videos from YouTube, Twit
 
 - Android Studio Hedgehog (2023.1.1) or newer
 - Android SDK 34
-- A physical device or emulator running Android 8.0+ (API 26+)
+- Physical device or emulator running Android 8.0+ (API 26+)
 
 ### 2. Get the yt-dlp Binary
 
 REM uses the **yt-dlp Android binary** which runs natively on Android without Python.
 
-Download the latest release from: https://github.com/yt-dlp/yt-dlp/releases
-
-You need **two binaries**:
+Download the latest release from the [yt-dlp releases page](https://github.com/yt-dlp/yt-dlp/releases).
 
 | File to download | Rename to | Purpose |
 |---|---|---|
-| `yt-dlp_android` (or `yt-dlp_linux_armv7l`) | `yt-dlp-arm64` | Real ARM64 Android devices |
+| `yt-dlp_android` (or `yt-dlp_linux_armv7l`) | `yt-dlp-arm64` | Physical ARM64 Android devices |
 | `yt-dlp_linux` (x86_64) | `yt-dlp-x86_64` | Android emulators (x86_64) |
 
 Place both files in:
@@ -46,14 +57,12 @@ app/src/main/assets/
 └── yt-dlp-x86_64
 ```
 
-> **Important:** The app detects the device architecture at runtime and uses the correct binary. If running on an ARM device (most phones), `yt-dlp-arm64` is used. If on an x86 emulator, `yt-dlp-x86_64` is used.
+> The app detects the device architecture at runtime and uses the correct binary.
 
 ### 3. Build and Run
 
 ```bash
-# Clone / open in Android Studio
-# Sync Gradle (File > Sync Project with Gradle Files)
-# Run on device or emulator
+# Open in Android Studio → Sync Gradle → Run on device
 ```
 
 Or via command line:
@@ -69,47 +78,64 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 com.rem.downloader/
 ├── ui/
-│   └── MainActivity.kt          # Single-activity UI, ExoPlayer setup
+│   ├── MainActivity.kt          # Single-activity UI, tabs, ExoPlayer, edit controls
+│   ├── SettingsActivity.kt      # Accent color, preferences
+│   └── view/
+│       └── CropOverlayView.kt   # Custom crop handle overlay
 ├── viewmodel/
-│   └── MainViewModel.kt         # State management, coroutines
+│   └── MainViewModel.kt         # StateFlow/SharedFlow state, download orchestration
 ├── model/
-│   └── Models.kt                # VideoInfo, DownloadOptions data classes
+│   └── Models.kt                # VideoInfo, DownloadOptions, EditConfig, enums
 ├── worker/
-│   └── DownloadWorker.kt        # WorkManager worker, progress notifications
+│   └── DownloadWorker.kt        # WorkManager worker: download → FFmpeg → save
 ├── service/
 │   └── DownloadForegroundService.kt
 └── util/
-    └── YtDlpHelper.kt           # Binary extraction, yt-dlp process management
+    ├── YtDlpHelper.kt           # Binary extraction, fetch info, preview download
+    ├── FFmpegHelper.kt          # FFmpeg command builder (trim, crop, GIF)
+    ├── FFmpegRunner.kt          # FFmpeg process execution, progress parsing
+    ├── MediaUtils.kt            # Duration formatting, frame extraction
+    └── ThemeManager.kt          # SharedPreferences wrapper for all settings
 ```
 
 **Key decisions:**
 
-- **Kotlin** — Modern Android standard, excellent coroutine support
-- **WorkManager** — Handles background downloads reliably; survives app backgrounding
-- **ExoPlayer (Media3)** — Best-in-class Android video player, built by Google
-- **yt-dlp binary** — Supports 1,000+ sites, actively maintained, no API keys needed
-- **MVVM** — Clean separation via ViewModel + StateFlow
-- **Material 3** — Modern dark theme with red accent
+- **Kotlin + Coroutines** — Modern Android standard with clean async flow
+- **WorkManager** — Handles background downloads reliably, survives app backgrounding
+- **ExoPlayer (Media3)** — Best-in-class Android video player for the preview
+- **yt-dlp binary** — Supports 1,000+ sites, no API keys needed, actively maintained
+- **FFmpeg** — Single-pass editing (trim + crop + format in one command, no re-encode for trim-only)
+- **MVVM** — ViewModel + StateFlow/SharedFlow for UI state; MediatorLiveData for WorkManager progress
+- **Material 3** — Dark theme with configurable accent color
 
 ---
 
-## How yt-dlp Integration Works
+## How the Download Pipeline Works
 
-1. **Binary extraction**: On first launch, `YtDlpHelper` extracts the appropriate yt-dlp binary from `assets/` to the app's private `filesDir` and marks it executable.
+### Fetch
+When you paste a URL and hit **Fetch Video**, the app runs:
+```
+yt-dlp --dump-json --no-download <url>
+```
+Returns title, thumbnail, duration, available formats, and dimensions.
 
-2. **Fetch info**: When you paste a URL and hit "Fetch Video", the app runs:
-   ```
-   yt-dlp --dump-json --no-download <url>
-   ```
-   This returns a JSON blob with title, thumbnail, duration, available formats, and direct stream URLs.
+### Preview (Advanced mode)
+A low-res (≤360p) pre-muxed stream is downloaded to the app's private cache for the ExoPlayer preview. This uses a single file to keep progress linear (0→100%).
 
-3. **Download**: When you hit "Download", a `WorkManager` job runs:
-   ```
-   yt-dlp -f <format_selector> -o <output_path> --merge-output-format mp4 <url>
-   ```
-   Progress is parsed from yt-dlp's stdout (`45.3%` pattern) and reported as a notification.
+### Download
+When you hit **Download**, a `DownloadWorker` job runs:
 
-4. **Output**: Files are saved to `Downloads/REM/` on the device.
+1. If **no edits**: downloads directly to `Downloads/REM/` with the chosen format and resolution
+2. If **edits exist** (trim/crop/GIF): downloads to a temp file in `cacheDir`, then runs a single FFmpeg command applying all edits, saves result to `Downloads/REM/`, deletes the temp file
+
+The FFmpeg command is built to be as efficient as possible:
+- Trim-only (no re-encode needed) → uses `-c copy`
+- Crop or GIF → re-encodes with the minimal filter chain
+
+Progress is reported as 0–80% for download and 80–100% for FFmpeg processing.
+
+### Crop scaling
+The crop overlay is drawn against the low-res preview dimensions. Before FFmpeg runs, the worker reads the actual downloaded file's dimensions using `MediaMetadataRetriever` and scales the crop coordinates proportionally — so crop is always pixel-accurate on the real video.
 
 ---
 
@@ -122,24 +148,15 @@ com.rem.downloader/
 | `WRITE_EXTERNAL_STORAGE` | Save to Downloads (Android ≤ 9) |
 | `READ_MEDIA_VIDEO` | Access saved videos (Android 13+) |
 | `FOREGROUND_SERVICE` | Keep download running in background |
+| `VIBRATE` | Optional haptic feedback on completion |
 
 ---
 
-## Supported Sites (Examples)
+## Supported Sites
 
-yt-dlp supports 1,000+ sites including:
+yt-dlp supports 1,000+ sites including YouTube (videos, shorts, playlists), Twitter/X, Instagram, TikTok, Reddit, Facebook, Vimeo, Twitch, Dailymotion, SoundCloud, and more.
 
-- YouTube (videos, shorts, playlists)
-- Twitter / X
-- Instagram (reels, posts)
-- TikTok
-- Reddit (video posts)
-- Facebook
-- Vimeo
-- Twitch (VODs, clips)
-- Dailymotion
-- SoundCloud (audio)
-- And hundreds more: https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md
+Full list: https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md
 
 ---
 
@@ -148,27 +165,15 @@ yt-dlp supports 1,000+ sites including:
 **"Could not fetch video info"**
 - Check internet connection
 - Ensure the yt-dlp binary is in `assets/` and correctly named
-- Some sites may require cookies — future enhancement
+- Some sites require cookies — not yet supported
 
-**Download stalls at 0%**
-- yt-dlp binary may not be executable — check `YtDlpHelper.extractBinary()`
-- Check logcat for `YtDlpHelper` tag
+**Download fails with FFmpeg error**
+- Check logcat for `DownloadWorker` or `FFmpegRunner` tags
+- Crop dimensions that exceed the actual video size will cause exit 234 — this is auto-corrected by the crop scaling logic
 
-**ExoPlayer preview doesn't load**
-- Not all sites expose direct stream URLs in JSON — preview falls back to thumbnail only
-- The download will still work even without preview
-
----
-
-## Future Improvements
-
-- [ ] Cookie import for age-gated / login-required content
-- [ ] Download history / library screen
-- [ ] Playlist/batch download support
-- [ ] Custom output directory picker
-- [ ] Speed/progress graph in notification
-- [ ] Audio-only with metadata tagging (MP3/M4A)
-- [ ] Auto-update yt-dlp binary in-app
+**Preview doesn't load**
+- Preview downloads a separate low-res clip. If the site doesn't have a pre-muxed ≤360p format, it may fall back to a slightly larger file
+- Download will still work regardless of preview state
 
 ---
 
@@ -176,4 +181,4 @@ yt-dlp supports 1,000+ sites including:
 
 MIT — feel free to modify and distribute.
 
-yt-dlp is licensed under the Unlicense. ExoPlayer (Media3) is Apache 2.0.
+yt-dlp is licensed under the Unlicense. ExoPlayer (Media3) and FFmpeg are Apache 2.0 / LGPL respectively.
