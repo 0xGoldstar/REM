@@ -112,7 +112,6 @@ The FFmpeg command is built to be as efficient as possible:
 - Trim-only (no re-encode needed) → uses `-c copy`
 - Crop or GIF → re-encodes with the minimal filter chain
 
-Progress is reported as 0–80% for download and 80–100% for FFmpeg processing.
 
 ### Crop scaling
 The crop overlay is drawn against the low-res preview dimensions. Before FFmpeg runs, the worker reads the actual downloaded file's dimensions using `MediaMetadataRetriever` and scales the crop coordinates proportionally — so crop is always pixel-accurate on the real video.
