@@ -39,27 +39,7 @@ REM is a clean, dark-themed Android video downloader and editor. Paste a URL, pr
 - Android SDK 34
 - Physical device or emulator running Android 8.0+ (API 26+)
 
-### 2. Get the yt-dlp Binary
-
-REM uses the **yt-dlp Android binary** which runs natively on Android without Python.
-
-Download the latest release from the [yt-dlp releases page](https://github.com/yt-dlp/yt-dlp/releases).
-
-| File to download | Rename to | Purpose |
-|---|---|---|
-| `yt-dlp_android` (or `yt-dlp_linux_armv7l`) | `yt-dlp-arm64` | Physical ARM64 Android devices |
-| `yt-dlp_linux` (x86_64) | `yt-dlp-x86_64` | Android emulators (x86_64) |
-
-Place both files in:
-```
-app/src/main/assets/
-├── yt-dlp-arm64
-└── yt-dlp-x86_64
-```
-
-> The app detects the device architecture at runtime and uses the correct binary.
-
-### 3. Build and Run
+### 2. Build and Run
 
 ```bash
 # Open in Android Studio → Sync Gradle → Run on device
