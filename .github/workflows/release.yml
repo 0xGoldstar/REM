@@ -1,0 +1,50 @@
+name: Release
+
+# Triggers when you push a version tag like v1.0.0
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+# Required so the workflow can create a GitHub Release
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Decode keystore
+        # Writes the keystore to a temp directory that is wiped after the job.
+        # The path itself is not secret — only the file contents and passwords are.
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/release.jks"
+
+      - name: Build signed release APK
+        env:
+          KEYSTORE_FILE: ${{ runner.temp }}/release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew assembleRelease
+
+      - name: Upload APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: REM ${{ github.ref_name }}
+          generate_release_notes: true
+          files: app/build/outputs/apk/release/app-release.apk

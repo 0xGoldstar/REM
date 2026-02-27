@@ -3,6 +3,17 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
+// ── Versioning ────────────────────────────────────────────────────────────────
+// CI sets GITHUB_REF_NAME to the pushed tag (e.g. "v1.2.3").
+// Local dev builds fall back to "dev" so the project always compiles.
+val tagName = System.getenv("GITHUB_REF_NAME") ?: "dev"
+val versionNameStr = tagName.removePrefix("v")          // "1.2.3" or "dev"
+val versionParts   = versionNameStr.split(".").mapNotNull { it.toIntOrNull() }
+// versionCode must be a positive integer — derive from semver digits, or 1 for dev.
+val versionCodeInt = if (versionParts.size == 3)
+    versionParts[0] * 10_000 + versionParts[1] * 100 + versionParts[2]
+else 1
+
 android {
     namespace = "com.rem.downloader"
     compileSdk = 34
@@ -11,9 +22,24 @@ android {
         applicationId = "com.rem.downloader"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = versionCodeInt
+        versionName = versionNameStr
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    // ── Signing ───────────────────────────────────────────────────────────────
+    // Credentials come from environment variables injected by the CI workflow.
+    // Never hard-code passwords or commit the keystore file.
+    signingConfigs {
+        create("release") {
+            val keystorePath = System.getenv("KEYSTORE_FILE")
+            if (!keystorePath.isNullOrBlank()) {
+                storeFile    = file(keystorePath)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias      = System.getenv("KEY_ALIAS")
+                keyPassword   = System.getenv("KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
@@ -23,6 +49,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
