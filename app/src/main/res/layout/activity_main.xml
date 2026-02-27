@@ -1,0 +1,896 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".ui.MainActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="0dp"
+        app:liftOnScroll="true">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/background"
+            app:title="REM"
+            app:titleTextAppearance="@style/TextAppearance.REM.Title"
+            app:titleTextColor="?attr/colorPrimary" />
+
+        <!-- Basic / Advanced tab bar -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/background"
+            app:tabMode="fixed"
+            app:tabGravity="fill"
+            app:tabIndicatorHeight="2dp"
+            app:tabIndicatorColor="?attr/colorPrimary"
+            app:tabSelectedTextColor="?attr/colorPrimary"
+            app:tabTextColor="@color/text_secondary"
+            app:tabTextAppearance="@style/TextAppearance.Material3.LabelLarge"
+            app:tabRippleColor="@android:color/transparent" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:fillViewport="true"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="32dp">
+
+            <!-- URL Input Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/stroke"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Paste URL"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginBottom="8dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            app:boxBackgroundColor="@color/input_background"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxStrokeColor="?attr/colorPrimary"
+                            app:boxStrokeWidth="1dp"
+                            app:hintEnabled="false"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/urlInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="https://..."
+                                android:imeOptions="actionSearch"
+                                android:inputType="textUri"
+                                android:singleLine="true"
+                                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                                android:textColor="@color/text_primary"
+                                android:paddingVertical="14dp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Combined Paste / Clear button -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnPasteClear"
+                            style="@style/Widget.Material3.Button.IconButton"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="6dp"
+                            app:icon="@drawable/ic_content_paste"
+                            app:iconTint="@color/text_secondary"
+                            android:contentDescription="Paste URL" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFetch"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="12dp"
+                        android:text="Fetch Video"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                        android:letterSpacing="0.05"
+                        app:backgroundTint="?attr/colorPrimary"
+                        app:cornerRadius="12dp"
+                        app:icon="@drawable/ic_search"
+                        app:iconGravity="textStart" />
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone"
+                        android:indeterminate="true"
+                        app:indicatorColor="?attr/colorPrimary"
+                        app:trackColor="@color/stroke" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Video Info Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardVideoInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/stroke"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/ivThumbnail"
+                        android:layout_width="100dp"
+                        android:layout_height="64dp"
+                        android:scaleType="centerCrop"
+                        android:background="@drawable/bg_thumbnail"
+                        android:contentDescription="Thumbnail" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <TextView
+                            android:id="@+id/tvTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:maxLines="2"
+                            android:ellipsize="end"
+                            android:textColor="@color/text_primary"
+                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                            tools:text="Sample Video Title" />
+
+                        <TextView
+                            android:id="@+id/tvMeta"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="@color/text_secondary"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                            tools:text="5:32 • YouTube" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Player Card (includes integrated trim controls) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardPlayer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/player_bg"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Video area with loading overlay -->
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="210dp">
+
+                        <androidx.media3.ui.PlayerView
+                            android:id="@+id/playerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:use_controller="false"
+                            app:resize_mode="fit"
+                            app:surface_type="surface_view" />
+
+                        <!-- Crop overlay — drawn over the live video -->
+                        <com.rem.downloader.ui.view.CropOverlayView
+                            android:id="@+id/cropOverlayView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:visibility="gone" />
+
+                        <!-- Play/Pause tap overlay -->
+                        <ImageView
+                            android:id="@+id/ivPlayPauseOverlay"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_play_pause_overlay"
+                            android:padding="16dp"
+                            android:src="@drawable/ic_play_arrow"
+                            android:contentDescription="Play/Pause"
+                            android:visibility="gone"
+                            android:clickable="false"
+                            android:focusable="false" />
+
+                        <!-- Preview download loading overlay -->
+                        <LinearLayout
+                            android:id="@+id/layoutPreviewLoading"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="24dp"
+                            android:visibility="gone"
+                            android:background="@color/player_bg">
+
+                            <TextView
+                                android:id="@+id/tvPreviewStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Fetching preview…"
+                                android:textColor="@color/text_primary"
+                                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                                android:layout_marginBottom="12dp" />
+
+                            <com.google.android.material.progressindicator.LinearProgressIndicator
+                                android:id="@+id/progressPreview"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:indeterminate="true"
+                                app:trackCornerRadius="4dp" />
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+
+                    <!-- Integrated trim controls (shown when preview is ready) -->
+                    <LinearLayout
+                        android:id="@+id/layoutTrimControls"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingBottom="8dp">
+
+                        <!-- Position / trim range row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginTop="6dp">
+
+                            <!-- Current playback position / total duration -->
+                            <TextView
+                                android:id="@+id/tvCurrentTime"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="0:00 / 0:00"
+                                android:textColor="@color/text_secondary"
+                                android:textAppearance="@style/TextAppearance.Material3.LabelMedium" />
+
+                            <!-- Selected trim range -->
+                            <TextView
+                                android:id="@+id/tvTrimStart"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0:00"
+                                android:textColor="?attr/colorPrimary"
+                                android:textAppearance="@style/TextAppearance.Material3.LabelMedium" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=" – "
+                                android:textColor="@color/text_secondary"
+                                android:textAppearance="@style/TextAppearance.Material3.LabelMedium" />
+
+                            <TextView
+                                android:id="@+id/tvTrimEnd"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0:00"
+                                android:textColor="?attr/colorPrimary"
+                                android:textAppearance="@style/TextAppearance.Material3.LabelMedium" />
+
+                        </LinearLayout>
+
+                        <!-- Slider + playhead indicator overlaid -->
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <com.google.android.material.slider.RangeSlider
+                                android:id="@+id/trimRangeSlider"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:valueFrom="0"
+                                android:valueTo="100"
+                                app:labelBehavior="gone"
+                                app:thumbColor="?attr/colorPrimary"
+                                app:trackColorActive="?attr/colorPrimary"
+                                app:trackColorInactive="@color/stroke" />
+
+                            <!-- Playhead: thin white bar showing current position -->
+                            <View
+                                android:id="@+id/positionIndicator"
+                                android:layout_width="3dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center_vertical"
+                                android:background="#FFFFFFFF"
+                                android:clickable="false"
+                                android:focusable="false"
+                                android:elevation="4dp" />
+
+                        </FrameLayout>
+
+                    </LinearLayout>
+
+                    <!-- Crop controls — shown when preview is ready, collapsed by default -->
+                    <LinearLayout
+                        android:id="@+id/layoutCropControls"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingBottom="12dp">
+
+                        <!-- Divider -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginBottom="4dp"
+                            android:background="@color/stroke" />
+
+                        <!-- Checkbox + label + live crop info -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <com.google.android.material.checkbox.MaterialCheckBox
+                                android:id="@+id/cbCropEnabled"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:buttonTint="?attr/colorPrimary" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Crop"
+                                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                                android:textColor="@color/text_primary" />
+
+                            <TextView
+                                android:id="@+id/tvCropInfo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Crop: 0×0"
+                                android:textColor="@color/text_secondary"
+                                android:textAppearance="@style/TextAppearance.Material3.LabelSmall" />
+
+                        </LinearLayout>
+
+                        <!-- Expand when crop is enabled: orientation toggle + ratio chips -->
+                        <LinearLayout
+                            android:id="@+id/layoutCropSettings"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginTop="8dp"
+                            android:visibility="gone">
+
+                            <!-- Orientation chips: left-aligned, same style as ratio chips -->
+                            <com.google.android.material.chip.ChipGroup
+                                android:id="@+id/chipGroupOrientation"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="4dp"
+                                app:singleSelection="true"
+                                app:selectionRequired="true"
+                                app:singleLine="true">
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/chipOrientLandscape"
+                                    style="@style/Widget.Material3.Chip.Filter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:checked="true"
+                                    android:contentDescription="Landscape"
+                                    android:text=""
+                                    app:chipIcon="@drawable/ic_ratio_landscape"
+                                    app:chipIconVisible="true"
+                                    app:chipIconSize="18dp"
+                                    app:checkedIconVisible="false"
+                                    app:chipStartPadding="8dp"
+                                    app:iconStartPadding="0dp"
+                                    app:iconEndPadding="0dp"
+                                    app:chipEndPadding="8dp" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/chipOrientPortrait"
+                                    style="@style/Widget.Material3.Chip.Filter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="Portrait"
+                                    android:text=""
+                                    app:chipIcon="@drawable/ic_ratio_portrait"
+                                    app:chipIconVisible="true"
+                                    app:chipIconSize="18dp"
+                                    app:checkedIconVisible="false"
+                                    app:chipStartPadding="8dp"
+                                    app:iconStartPadding="0dp"
+                                    app:iconEndPadding="0dp"
+                                    app:chipEndPadding="8dp" />
+
+                            </com.google.android.material.chip.ChipGroup>
+
+                            <!-- Ratio chips row — content changes based on orientation -->
+                            <HorizontalScrollView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:scrollbars="none">
+
+                                <com.google.android.material.chip.ChipGroup
+                                    android:id="@+id/chipGroupRatio"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    app:singleSelection="true"
+                                    app:selectionRequired="true"
+                                    app:singleLine="true">
+
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipRatioFree"
+                                        style="@style/Widget.Material3.Chip.Filter"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Free"
+                                        android:checked="true" />
+
+                                    <!-- Landscape ratios (visible by default) -->
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipRatio169"
+                                        style="@style/Widget.Material3.Chip.Filter"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="16:9" />
+
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipRatio43"
+                                        style="@style/Widget.Material3.Chip.Filter"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="4:3" />
+
+                                    <!-- Square (always visible) -->
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipRatio11"
+                                        style="@style/Widget.Material3.Chip.Filter"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="1:1" />
+
+                                    <!-- Portrait ratios (hidden by default) -->
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipRatio916"
+                                        style="@style/Widget.Material3.Chip.Filter"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="9:16"
+                                        android:visibility="gone" />
+
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipRatio34"
+                                        style="@style/Widget.Material3.Chip.Filter"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="3:4"
+                                        android:visibility="gone" />
+
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipRatio45"
+                                        style="@style/Widget.Material3.Chip.Filter"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="4:5"
+                                        android:visibility="gone" />
+
+                                </com.google.android.material.chip.ChipGroup>
+
+                            </HorizontalScrollView>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Download Options Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardOptions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/stroke"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Download Options"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                        android:textColor="@color/text_primary"
+                        android:layout_marginBottom="16dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FORMAT"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="@color/text_secondary"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="8dp" />
+
+                    <RadioGroup
+                        android:id="@+id/rgFormat"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp">
+
+                        <com.google.android.material.radiobutton.MaterialRadioButton
+                            android:id="@+id/rbVideoAudio"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:checked="true"
+                            android:text="Video + Audio"
+                            app:buttonTint="?attr/colorPrimary" />
+
+                        <com.google.android.material.radiobutton.MaterialRadioButton
+                            android:id="@+id/rbVideoOnly"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Video Only"
+                            app:buttonTint="?attr/colorPrimary" />
+
+                    </RadioGroup>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RESOLUTION"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="@color/text_secondary"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="8dp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerResolution"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:background="@drawable/bg_spinner"
+                        android:paddingHorizontal="12dp"
+                        android:layout_marginBottom="16dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RENAME FILE (optional)"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="@color/text_secondary"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:boxBackgroundColor="@color/input_background"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxStrokeColor="?attr/colorPrimary"
+                        app:hintEnabled="false"
+                        android:layout_marginBottom="16dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etRename"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Leave blank to keep original title"
+                            android:inputType="textNoSuggestions"
+                            android:singleLine="true"
+                            android:paddingVertical="14dp"
+                            android:textColor="@color/text_primary"
+                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- ═══ OUTPUT FORMAT TOGGLE (MP4 / GIF) ═══ -->
+                    <TextView
+                        android:id="@+id/tvOutputFormatLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="OUTPUT FORMAT"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="@color/text_secondary"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone" />
+
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/toggleOutputFormat"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:visibility="gone"
+                        app:singleSelection="true"
+                        app:selectionRequired="true">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnFormatMp4"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="44dp"
+                            android:layout_weight="1"
+                            android:text="MP4"
+                            android:checked="true" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnFormatGif"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="44dp"
+                            android:layout_weight="1"
+                            android:text="GIF" />
+
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                    <!-- GIF Settings (collapsible, shown when GIF selected) -->
+                    <LinearLayout
+                        android:id="@+id/layoutGifSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="FRAME RATE"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                            android:textColor="@color/text_secondary"
+                            android:letterSpacing="0.1"
+                            android:layout_marginBottom="8dp" />
+
+                        <com.google.android.material.button.MaterialButtonToggleGroup
+                            android:id="@+id/toggleFps"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            app:singleSelection="true"
+                            app:selectionRequired="true">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnFps10"
+                                style="@style/Widget.Material3.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_weight="1"
+                                android:text="10 fps"
+                                android:textSize="12sp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnFps15"
+                                style="@style/Widget.Material3.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_weight="1"
+                                android:text="15 fps"
+                                android:textSize="12sp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnFps24"
+                                style="@style/Widget.Material3.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_weight="1"
+                                android:text="24 fps"
+                                android:textSize="12sp" />
+
+                        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="QUALITY"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                            android:textColor="@color/text_secondary"
+                            android:letterSpacing="0.1"
+                            android:layout_marginBottom="8dp" />
+
+                        <com.google.android.material.button.MaterialButtonToggleGroup
+                            android:id="@+id/toggleQuality"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            app:singleSelection="true"
+                            app:selectionRequired="true">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnQualityLow"
+                                style="@style/Widget.Material3.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_weight="1"
+                                android:text="Low 320px"
+                                android:textSize="11sp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnQualityMed"
+                                style="@style/Widget.Material3.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_weight="1"
+                                android:text="Med 480px"
+                                android:textSize="11sp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnQualityHigh"
+                                style="@style/Widget.Material3.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_weight="1"
+                                android:text="High 640px"
+                                android:textSize="11sp" />
+
+                        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                        <TextView
+                            android:id="@+id/tvGifEstimate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Estimated size: ~0 MB"
+                            android:textColor="@color/text_secondary"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                            android:layout_marginBottom="16dp" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDownload"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:text="Download"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                        android:letterSpacing="0.05"
+                        app:backgroundTint="?attr/colorPrimary"
+                        app:cornerRadius="14dp"
+                        app:icon="@drawable/ic_download"
+                        app:iconGravity="textStart"
+                        app:iconSize="22dp" />
+
+                    <!-- Download Progress (inline, hidden by default) -->
+                    <LinearLayout
+                        android:id="@+id/layoutDownloadProgress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="16dp"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/tvDownloadStatus"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/text_primary"
+                                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+                            <TextView
+                                android:id="@+id/tvDownloadPercent"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_secondary"
+                                android:textAppearance="@style/TextAppearance.Material3.LabelMedium" />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/downloadProgressBar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:indicatorColor="?attr/colorPrimary"
+                            app:trackColor="@color/stroke"
+                            app:trackCornerRadius="4dp"
+                            app:trackThickness="8dp"
+                            android:indeterminate="true" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
