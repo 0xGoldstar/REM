@@ -1,8 +1,11 @@
 # Built outputs
 /build/
 /app/build/
+/app/release/
 *.apk
 *.aab
+*.hprof
+lint-results*
 
 # Gradle
 .gradle/
