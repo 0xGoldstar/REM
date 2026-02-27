@@ -42,9 +42,28 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew assembleRelease
 
+      - name: Rename APK
+        run: |
+          mv app/build/outputs/apk/release/app-release.apk \
+             app/build/outputs/apk/release/REM-${{ github.ref_name }}.apk
+
+      - name: Read changelog
+        id: changelog
+        run: |
+          FILE="changelogs/${{ github.ref_name }}.md"
+          if [ -f "$FILE" ]; then
+            echo "body<<EOF" >> $GITHUB_OUTPUT
+            cat "$FILE"     >> $GITHUB_OUTPUT
+            echo "EOF"      >> $GITHUB_OUTPUT
+            echo "has_changelog=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changelog=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Upload APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: REM ${{ github.ref_name }}
-          generate_release_notes: true
-          files: app/build/outputs/apk/release/app-release.apk
+          body: ${{ steps.changelog.outputs.body }}
+          generate_release_notes: ${{ steps.changelog.outputs.has_changelog == 'false' }}
+          files: app/build/outputs/apk/release/REM-${{ github.ref_name }}.apk
