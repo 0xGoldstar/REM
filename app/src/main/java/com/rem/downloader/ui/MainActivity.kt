@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.transition.TransitionManager
 import coil.load
@@ -252,15 +253,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.rbVideoOnly -> "bestvideo/best"
                 else -> "bestvideo+bestaudio/best"
             }
-            val resolution = when (binding.spinnerResolution.selectedItem?.toString()) {
-                "4K (2160p)" -> "2160"
-                "1080p" -> "1080"
-                "720p" -> "720"
-                "480p" -> "480"
-                "360p" -> "360"
-                "Best" -> "best"
-                else -> "best"
-            }
+            val resolution = binding.spinnerResolution.selectedItem?.toString()?.let { item ->
+                if (item == "Best") "best" else item.removeSuffix("p")
+            } ?: "best"
             val customName = binding.etRename.text.toString().trim().ifEmpty { null }
 
             // Sync crop coords from overlay if crop is enabled
@@ -429,6 +424,7 @@ class MainActivity : AppCompatActivity() {
         player = ExoPlayer.Builder(this).build().also { exo ->
             binding.playerView.player = exo
             exo.setMediaItem(MediaItem.fromUri(android.net.Uri.fromFile(java.io.File(filePath))))
+            exo.repeatMode = Player.REPEAT_MODE_ONE
             exo.playWhenReady = true
             exo.prepare()
             // NOTE: do NOT set cropOverlayView dims from preview video size —

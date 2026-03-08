@@ -7,6 +7,8 @@ import com.rem.downloader.model.VideoInfo
 import com.yausername.youtubedl_android.YoutubeDL
 import com.yausername.youtubedl_android.YoutubeDLRequest
 import java.io.File
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 class YtDlpHelper(private val context: Context) {
 
@@ -14,14 +16,17 @@ class YtDlpHelper(private val context: Context) {
         private const val TAG = "YtDlpHelper"
     }
 
-    fun getVideoInfo(url: String): Result<VideoInfo> {
+    suspend fun getVideoInfo(url: String): Result<VideoInfo> {
         return try {
-            val info = YoutubeDL.getInstance().getInfo(url)
-            // Always probe for playlist entries — for platforms like Twitter/X, yt-dlp outputs
-            // one JSON per video (not a playlist wrapper), so info.formats may be non-empty
-            // even for multi-video posts. The probe is fast (flat-playlist, no download).
-            val entries = tryGetEntries(url)
-            Result.success(mapToVideoInfo(info, url, entries))
+            coroutineScope {
+                // Run both calls in parallel — getInfo and tryGetEntries are independent
+                // and each takes a few seconds, so parallelising halves the wait time.
+                val infoDeferred = async { YoutubeDL.getInstance().getInfo(url) }
+                val entriesDeferred = async { tryGetEntries(url) }
+                val info = infoDeferred.await()
+                val entries = entriesDeferred.await()
+                Result.success(mapToVideoInfo(info, url, entries))
+            }
         } catch (e: Exception) {
             Log.e(TAG, "getVideoInfo error: ${e.message}")
             Result.failure(e)

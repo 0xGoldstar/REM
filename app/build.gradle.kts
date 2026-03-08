@@ -106,7 +106,7 @@ dependencies {
     implementation("io.coil-kt:coil:2.6.0")
 
     // youtubedl-android (yt-dlp wrapper for Android)
-    implementation("io.github.junkfood02.youtubedl-android:library:0.17.3")
+    implementation("io.github.junkfood02.youtubedl-android:library:0.18.1")
     implementation("io.github.junkfood02.youtubedl-android:ffmpeg:0.17.3")
     implementation("io.github.junkfood02.youtubedl-android:aria2c:0.17.3")
 

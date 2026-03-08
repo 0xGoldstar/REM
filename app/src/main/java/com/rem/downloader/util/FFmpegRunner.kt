@@ -10,6 +10,45 @@ object FFmpegRunner {
     private const val TAG = "FFmpegRunner"
 
     /**
+     * Finds libc++_shared.so by reading /proc/self/maps — the running process already has it
+     * mapped into memory (via Android's JNI namespace), so we can get its real on-disk path
+     * even when it's not in nativeLibDir or any standard system path.
+     * Falls back to a list of known candidate paths.
+     */
+    private fun findLibCppShared(nativeLibDir: String): java.io.File? {
+        // Primary: find the actual mapped path from the live process
+        try {
+            java.io.File("/proc/self/maps").forEachLine { line ->
+                if (line.contains("libc++_shared.so")) {
+                    // maps format: addr perms offset dev inode pathname
+                    val path = line.trim().split("\\s+".toRegex()).lastOrNull()
+                    if (path != null && path.startsWith("/")) {
+                        val f = java.io.File(path)
+                        if (f.isFile) throw FoundException(f)
+                    }
+                }
+            }
+        } catch (e: FoundException) {
+            Log.d(TAG, "libc++_shared.so found via /proc/self/maps: ${e.file.absolutePath}")
+            return e.file
+        } catch (e: Exception) {
+            Log.w(TAG, "proc/self/maps search failed: ${e.message}")
+        }
+
+        // Fallback: known static locations
+        val candidates = listOf(
+            java.io.File(nativeLibDir, "libc++_shared.so"),
+            java.io.File("/apex/com.android.art/lib64/libc++_shared.so"),
+            java.io.File("/apex/com.android.runtime/lib64/libc++_shared.so"),
+            java.io.File("/system/lib64/libc++_shared.so")
+        )
+        return candidates.firstOrNull { it.isFile }
+            .also { if (it == null) Log.e(TAG, "libc++_shared.so not found in any candidate") }
+    }
+
+    private class FoundException(val file: java.io.File) : Exception()
+
+    /**
      * Executes FFmpeg (libffmpeg.so) with the given arguments, parsing stderr for progress.
      *
      * LD_LIBRARY_PATH is set to include:
@@ -38,6 +77,28 @@ object FFmpegRunner {
         val ffmpegLibDir = FFmpegHelper.getFFmpegLibDir(context)
         val ldPath = if (ffmpegLibDir != null) "$nativeLibDir:$ffmpegLibDir" else nativeLibDir
         Log.d(TAG, "LD_LIBRARY_PATH=$ldPath")
+
+        // libc++_shared.so is needed by librubberband.so (added in youtubedl-android 0.18.x).
+        // Android namespace isolation prevents subprocesses from finding it via the app's JNI
+        // namespace. Copy it into ffmpegLibDir (app data dir, accessible to subprocesses).
+        // The file is never on the normal filesystem, but it IS mapped into the running process —
+        // find its actual path via /proc/self/maps and copy from there.
+        if (ffmpegLibDir != null) {
+            val dst = java.io.File(ffmpegLibDir, "libc++_shared.so")
+            if (!dst.exists()) {
+                val src = findLibCppShared(nativeLibDir)
+                if (src != null) {
+                    try {
+                        src.copyTo(dst)
+                        Log.d(TAG, "libc++_shared.so copied from ${src.absolutePath} (${dst.length()} bytes)")
+                    } catch (e: Exception) {
+                        Log.w(TAG, "libc++_shared.so copy failed: ${e.message}")
+                    }
+                } else {
+                    Log.e(TAG, "libc++_shared.so not found anywhere — FFmpeg will likely fail")
+                }
+            }
+        }
 
         val env = processBuilder.environment()
         env["LD_LIBRARY_PATH"] = ldPath
