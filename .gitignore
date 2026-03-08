@@ -1,0 +1,39 @@
+# Built outputs
+/build/
+/app/build/
+/app/release/
+*.apk
+*.aab
+*.hprof
+lint-results*
+
+# Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Local config (contains SDK path)
+local.properties
+
+# Native build cache
+/app/.cxx/
+.externalNativeBuild/
+
+# Profiling / captures
+captures/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Signing keys
+*.jks
+*.keystore
+
+# Claude Code
+.claude/

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand (used as theme fallback in themes.xml) -->
+    <color name="accent_red">#E53935</color>
+    <color name="accent_red_dark">#B71C1C</color>
+
+    <!-- Launcher icon background -->
+    <color name="ic_launcher_background">#2B2B2F</color>
+
+    <!-- Dark theme backgrounds -->
+    <color name="background">#0D0D0D</color>
+    <color name="surface">#161616</color>
+    <color name="surface_variant">#1F1F1F</color>
+    <color name="player_bg">#000000</color>
+    <color name="input_background">#1A1A1A</color>
+    <color name="stroke">#2A2A2A</color>
+
+    <!-- Text -->
+    <color name="text_primary">#F5F5F5</color>
+    <color name="text_secondary">#9E9E9E</color>
+    <color name="text_hint">#616161</color>
+
+    <!-- Status -->
+    <color name="success">#43A047</color>
+    <color name="error">#E53935</color>
+    <color name="warning">#FB8C00</color>
+
+    <!-- Required by theme -->
+    <color name="white">#FFFFFFFF</color>
+</resources>
